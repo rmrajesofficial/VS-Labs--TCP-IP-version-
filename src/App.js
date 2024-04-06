@@ -226,48 +226,7 @@ function App() {
 
 
 
-  const [nodes, setNodes] = useState([
-    {
-      id: "1",
-      data: { data_recieved: null, data_shared: 110101, type: 'Switch', name: "Switch", image: Switch },
-      image: { Switch },
-      type: 'component',
-      position: { x: 0, y: 0 },
-      sourcePosition: 'right',
-      targetPosition: 'left',
-
-      mac: macgenerate()
-    },
-    {
-      id: "2",
-      data: { data_recieved: null, data_shared: null, type: 'Data-Center', name: "DataCenter", image: DataCenter, },
-      type: 'component',
-      position: { x: 10, y: 10 },
-      sourcePosition: 'right',
-      targetPosition: 'left',
-
-      mac: macgenerate()
-    }, {
-      id: '3',
-      data: { data_recieved: null, data_shared: null, type: 'Hub', name: "Hub", image: Hub, },
-      type: 'component',
-      position: { x: 20, y: 20 },
-      sourcePosition: 'right',
-      targetPosition: 'left',
-
-
-      mac: macgenerate()
-    }, {
-      id: '4',
-      data: { data_recieved: null, data_shared: null, type: 'Laptop', name: "Laptop", image: Laptop, },
-      type: 'component',
-      position: { x: 50, y: 50 },
-      sourcePosition: 'right',
-      targetPosition: 'left',
-
-      mac: macgenerate()
-    },
-  ]);
+  const [nodes, setNodes] = useState([]);
 
 
   const [edges, setEdges] = useState(initialEdges);
@@ -624,7 +583,7 @@ function App() {
         </Flex >
         <Flex height="30px" maxH="30px" bg="black" py="auto" justifyContent={'space-between'}>
           <Text textColor="white" fontSize={13} mx={10}>Developed and Maintained by: Rajes Manna</Text>
-          <Text textColor="#f5f5f5" fontSize={13} mx={20}>copyright © 2023 VirtualSimilationLab</Text>
+          <Text textColor="#f5f5f5" fontSize={13} mx={20}>copyright © 2022 VirtualSimilationLab</Text>
           {/* {selectedEdge && selectedEdge.get("data")(<Text textColor="white" fontSize={13} mx={20}>Data Passes: {selectedEdge.get("data")}</Text>)} */}
         </Flex>
       </Flex >
