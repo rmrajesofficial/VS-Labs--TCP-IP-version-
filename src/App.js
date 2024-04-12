@@ -3,9 +3,9 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Navigation } from 'react-minimal-side-navigation';
 import 'react-minimal-side-navigation/lib/ReactMinimalSideNavigation.css';
-import { Flex, Divider, Link, Text, Button, Grid, Image, Box, Icon, Center, Select, Input } from '@chakra-ui/react';
+import { useDisclosure, ButtonGroup, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Flex, Divider, Link, Text, Button, Grid, Image, Box, Icon, Center, Select, Input } from '@chakra-ui/react';
 import { PiHouseLineDuotone, PiNotePencilDuotone, PiPlusSquareDuotone, PiShareNetworkDuotone, PiTrashDuotone } from "react-icons/pi";
-import { SlArrowUp, SlArrowDown } from "react-icons/sl";
+import { SlArrowUp, SlArrowDown, SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import 'reactflow/dist/style.css';
 import logo from "./assets/Black___Blue_Minimalist_Modern_Initial_Font_Logo-removebg-preview.png"
 import DataCenter from "./assets/icons8-data-center-64.png"
@@ -48,7 +48,6 @@ function divider(name) {
   </Flex>);
 }
 
-const initialEdges = [];
 
 
 function macgenerate() {
@@ -68,18 +67,17 @@ const topology = {
   star: {
     node: [{
       id: "1",
-      data: { data_received: null, data_shared: null, type: 'Hub', name: "Hub", image: Hub },
+      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Switch', name: "Switch", image: Switch },
       type: 'component',
       position: { x: 0, y: 0 },
       sourcePosition: 'right',
-      error: 2,
       targetPosition: 'left',
 
       mac: macgenerate()
     },
     {
       id: "2",
-      data: { data_received: null, data_shared: null, type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: -200, y: 0 },
       sourcePosition: 'right',
@@ -89,7 +87,7 @@ const topology = {
     },
     {
       id: '3',
-      data: { data_received: null, data_shared: null, type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 200, y: -200 },
       sourcePosition: 'right',
@@ -99,7 +97,7 @@ const topology = {
     },
     {
       id: '4',
-      data: { data_received: null, data_shared: null, type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 200, y: 0 },
       sourcePosition: 'right',
@@ -109,7 +107,7 @@ const topology = {
     },
     {
       id: '5',
-      data: { data_received: null, data_shared: null, type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 200, y: 200 },
       sourcePosition: 'right',
@@ -125,7 +123,7 @@ const topology = {
   mesh: {
     node: [{
       id: "1",
-      data: { data_received: null, data_shared: 110101, type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: -100, y: 0 },
       sourcePosition: 'right',
@@ -135,32 +133,29 @@ const topology = {
     },
     {
       id: "2",
-      data: { data_received: null, data_shared: null, type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 100, y: -200 },
       sourcePosition: 'right',
       targetPosition: 'left',
-
       mac: macgenerate()
     },
     {
       id: '3',
-      data: { data_received: null, data_shared: null, type: 'Workstation', name: "Workstation", image: Workstation },
+      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Workstation', name: "Workstation", image: Workstation },
       type: 'component',
       position: { x: 300, y: 0 },
       sourcePosition: 'right',
       targetPosition: 'left',
-
       mac: macgenerate()
     },
     {
       id: '4',
-      data: { data_received: null, data_shared: null, type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 100, y: 200 },
       sourcePosition: 'right',
       targetPosition: 'left',
-
       mac: macgenerate()
     }],
     edge: [{ source: '1', target: '2', id: 'reactflow__edge-1-2', selected: false },
@@ -172,12 +167,192 @@ const topology = {
   }
 }
 function App() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [data, setData] = useState({
+    rename: null,
+    binaryData: null,
+    path: {},
+    EDetection: "CRC",
+    Ecorrection: false,
+    framming: 'Bit Stuffing',
+    flag: "0111",
+    generator: '101',
+    selectedComponent: null,
+    preview: null,
+    codeword: null,
+    frameword: null,
+  })
+  const handleRename = (event, flag) => {
+    if (flag) {
+      if (data.rename !== null && data.rename !== '' && data.rename !== undefined) {
+        const updateNode = nodes.find((node) => node.id === selectedComponent.id);
+        if (updateNode) {
+          updateNode.data.name = data.rename;
+          console.log(updateNode);
+          setNodes(nodes.map((node) => node.id === updateNode.id ? updateNode : node));
+          setSelectedComponent(updateNode);
+          return;
+        }
+      }
+    }
+    setData({ ...data, rename: event.target.value });
+  };
 
+  const handleDataChange = (e) => {
+    console.log(data);
+    const dataNew = stringToBinary(e.target.value)
+    setData({ ...data, binaryData: dataNew });
+  };
+  const handleClose = () => {
+    setData({
+      rename: null,
+      binaryData: null,
+      path: {},
+      EDetection: data.EDetection,
+      Ecorrection: data.Ecorrection,
+      generator: data.generator,
+      framming: 'Bit Stuffing',
+      codeword: null,
+      frameword: null,
+      flag: "0111",
+      selectedComponent: null,
+      preview: null,
+    });
+    onClose()
+  };
+  const handleDetectionChange = (event) => {
+    console.log(data);
+    setData({ ...data, EDetection: event.target.value });
+  };
+
+  const handleFetchPath = () => {
+    const currentNode = nodes.find((node) => node.id === selectedComponent.id);
+    const connectedEdges = edges.filter((edge) => edge.source === currentNode.id);
+    if (connectedEdges.length === 0)
+      alert("No component found Try to reconnect")
+    const fetchFurther = (value, node, intermediateNodes = []) => {
+      const connectedEdges = edges.filter((edge) => edge.source === node.id);
+      connectedEdges.forEach((edge) => {
+        const targetNode = nodes.find((n) => n.id === edge.target);
+        const newValue = [...value, targetNode.id];
+        let newIntermediateNodes = [...intermediateNodes];
+        if (!newValue.includes(targetNode.id)) { // Check if targetNode.id is not already included
+          newIntermediateNodes = [...intermediateNodes, node.id]; // Store intermediate node
+        }
+        if (targetNode.data.type === "Switch" || targetNode.data.type === "Hub") {
+          fetchFurther(newValue, targetNode, newIntermediateNodes);
+        } else {
+          data.path[targetNode.id] = newValue;
+        }
+      });
+    };
+    connectedEdges.forEach((edge) => {
+      const targetNode = nodes.find((n) => n.id === edge.target);
+      fetchFurther([selectedComponent.id, targetNode.id], targetNode);
+    });
+    const updatedPath = { ...data.path };
+    connectedEdges.forEach((edge) => {
+      const targetNode = nodes.find((n) => n.id === edge.target);
+      updatedPath[targetNode.id] = [selectedComponent.id, targetNode.id];
+    });
+    setData({ ...data, path: updatedPath });
+    console.log(data.path);
+  };
+  const handleComponentSelect = (component) => {
+    setData({ ...data, selectedComponent: component });
+    console.log(data);
+  };
+
+
+  const EDetection = (data) => {
+    if (data.EDetection === "CRC") {
+      const polynomialDivision = (dividend, divisor) => {
+        const dividendArray = dividend.split("").map(Number);
+        const divisorArray = divisor.split("").map(Number);
+        let remainder = [...dividendArray];
+        for (let i = 0; i <= remainder.length - divisorArray.length; i++) {
+          if (remainder[i] === 1) {
+            for (let j = 0; j < divisorArray.length; j++) {
+              remainder[i + j] ^= divisorArray[j];
+            }
+          }
+        }
+        let startIndex = 0;
+        while (startIndex < remainder.length && remainder[startIndex] === 0)
+          startIndex++;
+        return remainder.slice(startIndex).join("");
+      };
+      const paddedBinaryData = data.binaryData + "0".repeat(data.generator.length - 1);
+      const remainder = polynomialDivision(paddedBinaryData, data.generator);
+      const dataNew = data.binaryData + remainder
+      return dataNew;
+    }
+    else if (data.EDetection === "Hamming") {
+      let string = '';
+      let chunks = data.binaryData.match(/.{1,4}/g);
+      const xorBits = (bit1, bit2, bit3) => {
+        return parseInt(bit1) ^ parseInt(bit2) ^ parseInt(bit3);
+      };
+      const hamming = (chunk) => {
+        let bits = new Array
+        let chunkBits = chunk.split("");
+        bits.push(...chunkBits);
+        const p1 = xorBits(bits[0], bits[2], bits[3]);
+        const p2 = xorBits(bits[0], bits[1], bits[3]);
+        const p3 = xorBits(bits[0], bits[1], bits[2]);
+        return `${bits[0]}${bits[1]}${bits[2]}${p3}${bits[3]}${p2}${p1}`
+      }
+      chunks.forEach((chunk) => {
+        if (chunk.length < 4)
+          string += chunk
+        else string += hamming(chunk);
+      })
+      return string;
+    }
+    else if (data.EDetection === "Parity") {
+      const onesCount = (data.binaryData.match(/1/g) || []).length;
+      const evenParity = onesCount % 2 === 0;
+      if (evenParity)
+        return data.binaryData + 0;
+      else return data.binaryData + 1;
+    }
+    console.log('EDetection is null');
+  }
+  const handlePreview = () => {
+    if (data.binaryData === null) {
+      alert("Data cannot be empty")
+    }
+    else if (data.selectedComponent === null) {
+      alert("Select the Destination address")
+    }
+    else {
+      let codeword = EDetection(data)
+      console.log(codeword);
+      function bitStuffing(word, flag) {
+        if (word === undefined) { console.log('EDetection not working'); return; }
+        var stuffedWord = "";
+        for (var i = 0; i < word.length; i++) {
+          stuffedWord += word[i];
+          if (stuffedWord.endsWith(flag) && i < word.length - 1) {
+            stuffedWord = stuffedWord.slice(0, -flag.length);
+            stuffedWord += "01101";
+          }
+        }
+        return stuffedWord;
+      }
+      var stuffedWord = bitStuffing(codeword, data.flag);
+      console.log(stuffedWord);
+      var PreviewWord = data.flag + stuffedWord + data.flag
+      setData({ ...data, codeword: codeword, frameword: stuffedWord, preview: PreviewWord });
+    }
+    console.log(data);
+  };
   const [physical, setPhysical] = useState({
     connection: " Ethernet-(Wired)",
-    topology: " Hybrid"
+    topology: " Hybrid",
+
   })
-  const [comp, setComp] = useState(false)
+  const [comp, setComp] = useState(true)
   const [selectedComponent, setSelectedComponent] = useState(null)
   const [selectedEdge, setSelectedEdge] = useState()
   const [images, setImages] = useState([
@@ -185,13 +360,22 @@ function App() {
     { id: 2, name: "Switch", image: Switch },
     { id: 3, name: "Hub", image: Hub },
     { id: 4, name: "Laptop", image: Laptop },
-    { id: 5, name: "Router", image: Router },
-    { id: 6, name: "Server", image: Server },
+    // { id: 5, name: "Router", image: Router },
+    // { id: 6, name: "Server", image: Server },
     { id: 7, name: "Workstation", image: Workstation },
   ])
+  const list = [
+    { name: 'Item 1', href: '/item1' },
+    { name: 'Item 2', href: '/item2' },
+  ];
+  const [nodes, setNodes] = useState([]);
+  const [edges, setEdges] = useState([]);
+  const [updatedNodes, setUpdatedNodes] = useState(null);
+  const [updatedEdges, setUpdatedEdges] = useState(null);
   const handleClick = () => {
     setComp(!comp);
   };
+
   const handleComponent = (id, name) => {
     setNodes(prevNodes => {
       const newX = prevNodes.length > 0 ? (prevNodes[prevNodes.length - 1].position.x + 10) : 10;
@@ -201,7 +385,7 @@ function App() {
         ...prevNodes,
         {
           id: prevNodes.length > 0 ? (parseInt(prevNodes[prevNodes.length - 1].id) + 1).toString() : "1",
-          data: { data_received: null, data_shared: null, type: name, name: name, image: image[0].image },
+          data: { data_received: null, data_shared: null, switchingTable: new Set(), type: name, name: name, image: image[0].image },
           type: 'component',
           position: { x: newX, y: newY },
           sourcePosition: 'right',
@@ -213,83 +397,101 @@ function App() {
     });
     console.log(nodes);
   };
-  const list = [
-    { name: 'Item 1', href: '/item1' },
-    { name: 'Item 2', href: '/item2' },
-  ];
+
 
   const activeKey = 2;
 
   const nodeTypes = useMemo(() => ({
     component: Component,
   }), []);
-
-
-
-  const [nodes, setNodes] = useState([]);
-
-
-  const [edges, setEdges] = useState(initialEdges);
-
-  const runSimulate = () => {
-    const updatedEdgesRec = [];
-    const updatedNodes = [...nodes];
-    const updatedEdges = edges.map(edge => ({ ...edge }));
-    updatedEdges.forEach((edge) => {
-      const sourceNode = updatedNodes.find((node) => node.id === edge.source);
-      const targetNode = updatedNodes.find((node) => node.id === edge.target);
-      if (sourceNode && targetNode && sourceNode.data.data_shared !== null && sourceNode.data.data_shared !== '') {
-        targetNode.data.data_recieved = sourceNode.data.data_shared;
-        if (targetNode.data.type !== "Laptop" &&
-          targetNode.data.type !== "Data-Center" &&
-          targetNode.data.type !== "Workstation" && targetNode.data.data_shared === null) {
-          targetNode.data.data_shared = sourceNode.data.data_shared;
-          updatedEdgesRec.push(...dfs(targetNode, updatedNodes))
-        }
-        edge.data = sourceNode.data.data_shared
-        edge.animated = true
+  const fetchEachPath = (switchNode) => {
+    const connectedEdges = edges.filter((edge) => edge.source === switchNode.id);
+    connectedEdges.forEach((edge) => {
+      const targetNode = nodes.find((node) => node.id === edge.target);
+      if (targetNode.data.type === "Switch") {
+        fetchEachPath(targetNode);
       }
+      switchNode.data.switchingTable.add(edge.target);
     });
-    const unfilteredEdges = updatedEdgesRec.concat(updatedEdges)
-    const edgeMap = new Map();
-    unfilteredEdges.forEach(edge => {
-      if (!edgeMap.has(edge.id)) {
-        edgeMap.set(edge.id, edge);
-      } else {
-        const existingEdge = edgeMap.get(edge.id);
-        Object.assign(existingEdge, edge);
-      }
-    });
-    const uniqueEdges = Array.from(edgeMap.values());
-    setEdges(uniqueEdges);
-    console.log(edges);
+    const updatedNodes = nodes.map((node) =>
+      node.id === switchNode.id ? switchNode : node
+    );
+    setNodes(updatedNodes);
   };
 
-  function dfs(sourceNode, updatedNodes) {
-    const updatedEdgesRec = [];
-    const updatedEdges = edges.map(edge => ({ ...edge }));
-    updatedEdges.forEach(edge => {
-      const targetNode = updatedNodes.find(node => sourceNode.id === edge.source);
-      if (sourceNode && targetNode && sourceNode.data.data_shared !== null) {
-        targetNode.data.data_received = sourceNode.data.data_shared;
-        if (targetNode.data.type !== "Laptop" &&
-          targetNode.data.type !== "Data-Center" &&
-          targetNode.data.type !== "Workstation" &&
-          targetNode.data.data_shared === null) {
-          targetNode.data.data_shared = sourceNode.data.data_shared;
-          updatedEdgesRec.push(...dfs(targetNode, updatedNodes));
-        }
-        edge.data = sourceNode.data.data_shared;
-        edge.animated = true;
-      }
+  const switchingTableFetch = () => {
+    const switches = nodes.filter((node) => node.data.type === "Switch");
+    switches.forEach((switchNode) => {
+      console.log(switchNode);
+      fetchEachPath(switchNode);
     });
+  };
+  const handleSimulate = () => {
+    const path = data.path[data.selectedComponent];
+    const sourceNode = nodes.find((node) => node.id === path[0]);
+    if (!sourceNode) {
+      console.error("Source node not found");
+      return;
+    }
+    let updatedNodes = [...nodes];
+    let updatedEdges = [...edges];
+    setUpdatedEdges(updatedNodes)
+    setUpdatedNodes(updatedEdges)
+    sourceNode.data.data_shared = data.preview;
+    updatedNodes = updatedNodes.map((node) =>
+      node.id === sourceNode.id ? sourceNode : node
+    );
+    for (let i = 1; i < path.length; i++) {
+      const targetNode = updatedNodes.find((node) => node.id === path[i]);
+      if (!targetNode) {
+        console.error("Target node not found");
+        continue;
+      }
+      const edge = updatedEdges.find(
+        (edge) => edge.source === path[i - 1] && edge.target === path[i]
+      );
+      if (!edge) {
+        console.error("Edge not found between nodes");
+        continue;
+      }
+      if (targetNode.data.type === "Switch" || targetNode.data.type === "Hub") {
+        targetNode.data.data_shared = sourceNode.data.data_shared;
+        if (targetNode.data.type === "Hub") {
+          const HubEdges = updatedEdges.filter(edge => edge.source === targetNode.id);
+          HubEdges.forEach((HubEdge) => {
+            const hubTargetNode = updatedNodes.find((node) => node.id === HubEdge.target);
+            hubTargetNode.data.data_received = sourceNode.data.data_shared;
+            const updatedHubEdge = { ...HubEdge, data: data.preview, animated: true };
+            updatedEdges = updatedEdges.map((edgeItem) =>
+              edgeItem.id === updatedHubEdge.id ? updatedHubEdge : edgeItem
+            );
+          })
+        }
+      }
+      targetNode.data.data_received = sourceNode.data.data_shared;
+      updatedNodes = updatedNodes.map((node) =>
+        node.id === targetNode.id ? targetNode : node
+      );
+      const updatedEdge = { ...edge, data: data.preview, animated: true };
+      updatedEdges = updatedEdges.map((edgeItem) =>
+        edgeItem.id === edge.id ? updatedEdge : edgeItem
+      );
+    }
+    setNodes(updatedNodes);
+    setEdges(updatedEdges);
+    console.log(updatedEdges);
+    console.log(updatedNodes);
+    handleClose()
+  };
 
-    return updatedEdgesRec.concat(updatedEdges);
-  }
+
+
 
   const onNodeClick = (event, node) => {
     setSelectedComponent(node)
+    setComp(false);
     console.log('Node clicked:', node);
+    switchingTableFetch()
   };
   const onEdgeClick = (event, edge) => {
     setSelectedEdge(edge)
@@ -379,6 +581,10 @@ function App() {
     }
 
   }
+  const getMac = (id) => {
+    const node = nodes.find((node) => node.id === id[0]);
+    return node ? node.mac : "Not Found";
+  };
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
     [],
@@ -392,7 +598,18 @@ function App() {
     (params) => setEdges((eds) => addEdge(params, eds)),
     [],
   );
-
+  const dataSet = (node) => {
+    setSelectedComponent(node)
+    onOpen()
+  }
+  const stopSimulate = () => {
+    // console.log(updatedNodes);
+    // console.log(updatedEdges);
+    // setNodes([...updatedNodes])
+    // setEdges([...updatedEdges])
+    setUpdatedEdges(null)
+    setUpdatedNodes(null)
+  }
   return (
     <>
       <Flex flexDirection="column" height="100vh">
@@ -400,15 +617,15 @@ function App() {
           <Image src={logo} boxSize={150} mr="auto" ml={20} mt={-4} mb={-2} />
 
           <Flex>
-            <Link mr="20px" _hover={{ color: "#EC4899", textDecoration: "underline" }}>
+            <Link mr="20px" _hover={{ color: "#EB4999", textDecoration: "underline" }}>
               <Text fontSize="lg" fontWeight="bold" color="gray.600">GitHub</Text>
             </Link>
-            <Link mr="20px" _hover={{ color: "#EC4899", textDecoration: "underline" }}>
+            <Link mr="20px" _hover={{ color: "#EB4999", textDecoration: "underline" }}>
               <Text fontSize="lg" fontWeight="bold" color="gray.600">Credits</Text>
             </Link>
           </Flex>
         </Flex>
-        <Divider borderColor="#EC4899" mx="2" width='auto' />
+        <Divider borderColor="#EB4999" mx="2" width='auto' />
         <Flex overflow="hidden">
           <Flex width="300px" minH="300px" my='2' bg="white" ml='2'>
             <Flex flexDirection="column" width="300px" >
@@ -452,14 +669,14 @@ function App() {
                   },
                 ]}
               />
-              <Button onClick={handleClick} variant="outline" py='2' borderWidth="1px" borderRadius="0px" borderTopColor="#EC4899">
-                {comp ? "Components" : "ControlBox"}
+              <Button onClick={handleClick} variant="outline" py='2' borderRadius={0} borderWidth="1px" borderColor="transparent" borderTopColor="#EB4999">
+                {comp ? "Components" : "Control Box"}
                 <Flex alignItems="center" ml="20px" my='8px'>
-                  {comp ? <SlArrowDown /> : <SlArrowUp />}
+                  {comp ? <SlArrowLeft /> : <SlArrowRight />}
                 </Flex>
               </Button>
               {comp && <Flex flexDirection="column" height="400px" border="2px solid gray.100">
-                <Divider borderColor="#EC4899" my="2" height='auto' />
+                <Divider borderColor="#EB4999" mb="2" height='auto' />
                 <Grid
                   templateColumns="repeat(3, 2fr)"
                   gap={4}
@@ -476,13 +693,13 @@ function App() {
                 </Grid>
               </Flex>
               }
-              <Divider borderColor="#EC4899" my="2" height='auto' />
+              <Divider borderColor="#EB4999" mb="2" height='auto' />
               {!comp &&
-                <Flex flexDirection="column" style={{ height: "100%" }}  >
-                  {selectedComponent ? (<Box height="400px" rounded="10" border="2px solid #EC4899" mr='2'>
+                <Flex flexDirection="column" style={{ height: "100%" }} >
+                  {selectedComponent ? (<Box height="400px" rounded="10" mr='2'>
                     <Flex justifyContent='center' py='2' rounded="10">
                       <Text fontSize='20' fontWeight='bold' >{selectedComponent.data.name}
-                        <Button bg='transparent' fontSize='25' p='0'> <PiNotePencilDuotone /> </Button></Text>
+                        <Button bg='transparent' fontSize='25' p='0' onClick={() => dataSet(selectedComponent)}> <PiNotePencilDuotone /> </Button></Text>
                     </Flex>
                     <>{divider("Physical")}</>
                     <Flex ml={8} rounded="10" fontSize='sm' >
@@ -503,30 +720,39 @@ function App() {
                         <Text fontWeight="bold" mr={1}>Error Correction: </Text>Error at {selectedComponent.error} bit
                       </Flex>)}
                     <Flex ml={8} rounded="10" fontSize='sm'>
-                      <Text fontWeight="bold" mr={1}>Data: </Text>
-                      {(selectedComponent.data.type === "Laptop" ||
-                        selectedComponent.data.type === "Data-Center" ||
-                        selectedComponent.data.type === "Workstation") ? (<Input
-                          key={selectedComponent.id}
-                          type="text"
-                          h={5}
-                          border='none'
-                          style={{ fontWeight: "bold", marginRight: "4px" }}
-                          value={selectedComponent.data.data_shared}
-                          placeholder='Enter Binary data'
-                          p="auto"
-                          fontSize="smaller"
-                          onChange={(e) => handleBinaryInputChange(selectedComponent.id, e)}
-                        />) : (selectedComponent.data.data_shared ? selectedComponent.data.data_shared : "No data Found")}</Flex>
+                      <Text fontWeight="bold" mr={1}>Shared: </Text>
+                      {selectedComponent.data.data_shared ? selectedComponent.data.data_shared : "No data Found"}</Flex>
+                    <Flex ml={8} rounded="10" fontSize='sm'>
+                      <Text fontWeight="bold" mr={1}>Recieved: </Text>
+                      {selectedComponent.data.data_received ? selectedComponent.data.data_received : "No data Found"}</Flex>
                     {selectedComponent.data.data_recieved && (<Flex ml={8} rounded="10" fontSize='sm'>
                       <Text fontWeight="bold" mr={1}>Data Received: </Text>{selectedComponent.data.data_recieved}</Flex>)}
+                    {selectedComponent.data.switchingTable.size !== 0 && (
+                      <Flex direction="column" mx={6} my={1} px={2} rounded={5} border="1px solid #CBD5E0">
+                        <Text fontSize="sm" fontWeight="bold" textAlign="center">Switching Table</Text>
+                        <Flex justify="space-between" fontSize="sm" mt={1} >
+                          <Text>Input Mac</Text>
+                          <Divider borderColor='gray.300' h="auto" orientation='vertical' />
+                          <Text>Output Mac</Text>
+                        </Flex>
+                        <Divider borderColor='gray.300' w="auto" />
+                        <Flex direction="column" >
+                          {[...selectedComponent.data.switchingTable.entries()].map(([i, j], index) => (
+                            <Flex key={index} justify="space-between" fontSize="sm">
+                              <Text fontSize={11}>{selectedComponent.mac}</Text>
+                              <Text fontSize={11}>{getMac(i)}</Text>
+                            </Flex>
+                          ))}
+                        </Flex>
+                      </Flex>
+                    )}
                     <Divider mx='6' w='auto' borderColor='gray.300' />
-                  </Box>) : (<Box height="400px" rounded="10" border="2px solid #EC4899" mr='2' p="auto" textAlign="center">Component is deleted or not selected</Box>)}
+                  </Box>) : (<Box height="400px" p="auto" textAlign="center">Component is deleted or not selected</Box>)}
 
                 </Flex>}
             </Flex>
           </Flex>
-          <Divider borderColor="#EC4899" orientation="vertical" my="2" height='auto' />
+          <Divider borderColor="#EB4999" orientation="vertical" my="2" height='auto' />
           <Flex overflow="hidden" flexDirection="column">
             <Divider borderColor='black' mt='1' mx="2" w='auto' />
             <Flex height="50px" mx="2" justifyContent='end'>
@@ -555,12 +781,12 @@ function App() {
                   <option value="Bluetooth-(wireless)">Bluetooth-(Wireless)</option>
                   {/* Add more connectivity options as needed */}
                 </Select>
-
               </Flex>
-              <Divider borderColor='gray.300' my='1' mx="2" h='auto' orientation='vertical' />
-              <Button bg='#EC4899' color='white' rounded='30' mx='6' my='1' height='auto' onClick={runSimulate}>Simulate</Button>
+              {updatedEdges !== null &&
+                <Divider borderColor='gray.300' my='1' mx="2" h='auto' orientation='vertical' />}
+              {updatedEdges !== null && (<Button bg='#EB4999' color='white' rounded='30' mx='6' my='1' height='auto' onClick={() => stopSimulate()}>Stop Simulate</Button>)}
             </Flex>
-            <Divider borderColor="#EC4899" mx="2" width='auto' />
+            <Divider borderColor="#EB4999" mx="2" width='auto' />
             <Flex overflow="hidden" rounded='2' bg="#F4F4F4" mx='2' mb='2'>
               <div style={{ height: '100vh', width: '100vw', paddingBottom: "100px" }}>
                 <ReactFlow
@@ -587,6 +813,92 @@ function App() {
           {/* {selectedEdge && selectedEdge.get("data")(<Text textColor="white" fontSize={13} mx={20}>Data Passes: {selectedEdge.get("data")}</Text>)} */}
         </Flex>
       </Flex >
+
+
+      <Modal isOpen={isOpen} onClose={handleClose}>
+        <ModalOverlay />
+        <ModalContent >
+          {selectedComponent && (
+            <Modal isOpen={isOpen} onClose={handleClose}>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>{selectedComponent.data.name}</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                  <Flex align="center" mb={4}>
+                    <Input value={data.rename} onChange={(e) => handleRename(e, false)} />
+                    <Button ml={2} colorScheme="blue" onClick={(e) => handleRename(e, true)}>Rename</Button>
+                  </Flex>
+                  {divider("Data")}
+                  <Flex flexDirection="column" alignItems="center">
+                    <Input value={data.binaryData} onChange={(e) => handleDataChange(e)} placeholder="Enter data" />
+                    {Object.keys(data.path).length === 0 ? (
+                      <Button colorScheme="blue" w="100px" my={2} onClick={handleFetchPath}>Fetch Path</Button>) :
+                      (
+                        <>
+                          <Text fontWeight="bold" >Available Components are: </Text>
+                          <ButtonGroup flexDirection="column" style={{ width: "100%" }}>
+                            {Object.keys(data.path).map((component) => (
+                              <Button
+                                fontSize={13}
+                                key={component}
+                                ml={2}
+                                px={2}
+                                onClick={() => handleComponentSelect(component)}
+                                variant={data.selectedComponent === component ? 'solid' : 'outline'}
+                                colorScheme={data.selectedComponent === component ? 'blue' : 'gray'}
+                                fontWeight="none"
+                              >
+                                ID: {component}  <Text mx={2} fontWeight="bold" > --{getMac(component)}--</Text>   is available
+                              </Button>
+                            ))}
+                          </ButtonGroup></>
+                      )}</Flex>
+                  {divider("Error Control")}
+                  <Select mb={4} onChange={handleDetectionChange}>
+                    <option value="CRC">CRC</option>
+                    <option value="Parity">Parity</option>
+                    <option value="Hamming">Hamming</option>
+                  </Select>
+                  {data.EDetection === "Hamming" && (
+                    <Flex>
+                      <Text fontWeight="bold" mx={2}>Error Correction:</Text> Hamming
+                    </Flex>
+                  )}
+                  {data.EDetection === "CRC" && (
+                    <Flex>
+                      <Text fontWeight="bold" mx={2}>CRC-Generator:</Text> 101
+                    </Flex>
+                  )}
+                  {divider("Framing")}
+                  <Flex>
+                    <Text fontWeight="bold" mx={2}>Framming Technique:</Text> {data.framming}<br /></Flex>
+                  <Flex>
+                    <Text fontWeight="bold" mx={2}>Flag:</Text> {data.flag}
+                  </Flex>
+                  {data.preview !== null && divider("Preview")}
+                  {data.preview !== null && (
+                    <>
+                      <Flex>
+                        <Text fontWeight="bold" mx={2}>Destination Mac:</Text> {getMac(data.selectedComponent)}<br /></Flex>
+                      <Flex>
+                        <Text fontWeight="bold" mx={2}>Final Frame:</Text> <Text textColor="green" mr={1}>{data.flag}</Text> {data.frameword} <Text ml={1} textColor="green">{data.flag}</Text>
+                      </Flex>
+                    </>
+                  )}
+                </ModalBody>
+                <ModalFooter>
+                  {data.preview ? (<Button colorScheme="blue" mr={3} onClick={handleSimulate}>
+                    Simulate
+                  </Button>) : (<Button colorScheme="blue" mr={3} onClick={handlePreview}>
+                    Preview
+                  </Button>)}
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
+          )}
+        </ModalContent >
+      </Modal >
     </>
   );
 }
