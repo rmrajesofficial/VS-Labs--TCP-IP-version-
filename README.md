@@ -1,70 +1,65 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Virtual Simulation Labs
 
-## Available Scripts
 
-In the project directory, you can run:
+Virtual Simulation Labs is an interactive tool designed to simulate TCP/IP networks, offering users a comprehensive platform to explore networking concepts and protocols. From designing custom network topologies to simulating data transmission, Virtual Simulation Labs provides an immersive learning experience for network enthusiasts and students alike.
 
-### `npm start`
+## Key Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Topology Design
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Virtual Simulation Labs allows users to create custom network topologies or choose from predefined arrangements such as star and mesh. With an intuitive interface powered by React Flow, users can easily add, connect, and configure network components to design their ideal network layout.
 
-### `npm test`
+### Network Components
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The application features a wide range of network components, including:
 
-### `npm run build`
+- **Endpoints**: Represented by Laptops, Data Centers, and Workstations, endpoints serve as sources and destinations for data transmission.
+- **Switches**: Implementing switching tables, switches facilitate data forwarding between connected devices.
+- **Hubs**: Simple devices that broadcast data to all connected devices, hubs are essential for simulating basic network architectures.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Control Box
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+The Control Box provides users with detailed insights into selected components, including:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **Physical Layer**: Visualizes the current network topology and connectivity between components.
+- **Data Link Layer**: Displays information such as MAC addresses, received data, shared data, and error statistics.
 
-### `npm run eject`
+### Data Sharing
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Users can define various aspects of data transmission, including:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **Data Input**: Specify data in binary format to be transmitted between network components.
+- **Error Detection**: Choose from error detection techniques such as CRC, parity, and Hamming codes to detect transmission errors.
+- **Error Correction**: Select error correction methods like Hamming codes to correct errors in transmitted data.
+- **Framing Control**: Configure framing techniques such as bit stuffing and framing flags to structure transmitted data.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Simulation
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+The simulation feature enables real-time data transmission between connected components. Through animated edges, users can observe the flow of data within the network, facilitating a deeper understanding of networking principles.
 
-## Learn More
+## Getting Started
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+To get started with Virtual Simulation Labs, follow these steps:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. Clone the repository to your local machine.
+2. Install dependencies using `yarn Install`.
+3. Start the application using `yarn start`.
+4. Explore the various features and functionalities available in the application.
 
-### Code Splitting
+## Screenshots
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+![Screenshot 1](src/assets/s1.png)
+![Screenshot 2](src/assets/s2.png)
+*Caption: Star topology and Mesh topology*
 
-### Analyzing the Bundle Size
+![Screenshot 3](src/assets/s3.png)
+*Caption: Control box displaying component data and error information.*
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+![Screenshot 4](src/assets/s4.png)
+*Caption: Frame visualization*
 
-### Making a Progressive Web App
+## Contributing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+If you have ideas for new features, improvements, or bug fixes, please open an issue or submit a pull request.
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
