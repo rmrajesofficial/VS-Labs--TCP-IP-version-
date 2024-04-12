@@ -53,10 +53,10 @@ To get started with Virtual Simulation Labs, follow these steps:
 ![Screenshot 2](src/assets/s2.png)
 *Caption: Star topology and Mesh topology*
 
-![Screenshot 3](src/assets/s3.png)
+<img src="src/assets/s3.png" alt="Control box" width="300">
 *Caption: Control box displaying component data and error information.*
 
-![Screenshot 4](src/assets/s4.png)
+<img src="src/assets/s4.png" alt="Frame Visualization" width="600">
 *Caption: Frame visualization*
 
 ## Contributing
