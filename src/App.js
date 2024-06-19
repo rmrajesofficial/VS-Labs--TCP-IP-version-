@@ -67,7 +67,7 @@ const topology = {
   star: {
     node: [{
       id: "1",
-      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Switch', name: "Switch", image: Switch },
+      data: { ip: null, data_received: null, FTP: 0, http: 0, flow: null, data_shared: null, path: new Map(), routingTable: new Set(), switchingTable: new Set(), type: 'Switch', name: "Switch", image: Switch },
       type: 'component',
       position: { x: 0, y: 0 },
       sourcePosition: 'right',
@@ -76,7 +76,7 @@ const topology = {
     },
     {
       id: "2",
-      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, FTP: 0, http: 0, flow: null, data_shared: null, path: new Map(), routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: -200, y: 0 },
       sourcePosition: 'right',
@@ -85,7 +85,7 @@ const topology = {
     },
     {
       id: '3',
-      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, FTP: 0, http: 0, flow: null, data_shared: null, path: new Map(), routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 200, y: -200 },
       sourcePosition: 'right',
@@ -94,7 +94,7 @@ const topology = {
     },
     {
       id: '4',
-      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, FTP: 0, http: 0, flow: null, data_shared: null, path: new Map(), routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 200, y: 0 },
       sourcePosition: 'right',
@@ -103,7 +103,7 @@ const topology = {
     },
     {
       id: '5',
-      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, FTP: 0, http: 0, flow: null, data_shared: null, path: new Map(), routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 200, y: 200 },
       sourcePosition: 'right',
@@ -118,7 +118,7 @@ const topology = {
   mesh: {
     node: [{
       id: "1",
-      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, FTP: 0, http: 0, flow: null, data_shared: null, path: new Map(), routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: -100, y: 0 },
       sourcePosition: 'right',
@@ -127,7 +127,7 @@ const topology = {
     },
     {
       id: "2",
-      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, FTP: 0, http: 0, flow: null, data_shared: null, path: new Map(), routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 100, y: -200 },
       sourcePosition: 'right',
@@ -136,7 +136,7 @@ const topology = {
     },
     {
       id: '3',
-      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Workstation', name: "Workstation", image: Workstation },
+      data: { ip: null, data_received: null, FTP: 0, http: 0, flow: null, data_shared: null, path: new Map(), routingTable: new Set(), switchingTable: new Set(), type: 'Workstation', name: "Workstation", image: Workstation },
       type: 'component',
       position: { x: 300, y: 0 },
       sourcePosition: 'right',
@@ -145,7 +145,7 @@ const topology = {
     },
     {
       id: '4',
-      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, FTP: 0, http: 0, flow: null, data_shared: null, path: new Map(), routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 100, y: 200 },
       sourcePosition: 'right',
@@ -163,6 +163,7 @@ const topology = {
 function App() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [data, setData] = useState({
+    port: null,
     rename: null,
     ip: null,
     gateway: null,
@@ -245,6 +246,7 @@ function App() {
   };
   const handleClose = () => {
     setData({
+      port: null,
       rename: null,
       binaryData: null,
       path: {},
@@ -265,6 +267,10 @@ function App() {
   const handleDetectionChange = (event) => {
     console.log(data);
     setData({ ...data, EDetection: event.target.value });
+  };
+  const handlePortChange = (event) => {
+    console.log(data);
+    setData({ ...data, port: event.target.value });
   };
 
   const handleFetchPath = () => {
@@ -429,7 +435,7 @@ function App() {
         ...prevNodes,
         {
           id: prevNodes.length > 0 ? (parseInt(prevNodes[prevNodes.length - 1].id) + 1).toString() : "1",
-          data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: name, name: name, image: image[0].image },
+          data: { ip: null, data_received: null, FTP: 0, http: 0, flow: null, data_shared: null, path: new Map(), routingTable: new Set(), switchingTable: new Set(), type: name, name: name, image: image[0].image },
           type: 'component',
           position: { x: newX, y: newY },
           sourcePosition: 'right',
@@ -448,6 +454,27 @@ function App() {
   const nodeTypes = useMemo(() => ({
     component: Component,
   }), []);
+
+  const slidingWindow = (sourceNode, targetNode) => {
+    const size = 3;
+    let index = 0;
+    let ac = new Array(sourceNode.data.data_shared.length).fill(false);
+    while (index < sourceNode.data.data_shared.length) {
+      targetNode.data.data_received = sourceNode.data.data_shared[index];
+      ac[index] = true;
+      if (ac[index]) {
+        index++;
+      } else {
+        continue;
+      }
+    }
+    if (index >= sourceNode.data.data_shared.length) {
+      return "Sliding window protocol completed.";
+    } else {
+      return "Error: Index exceeded sourceNode.data.data_shared.length.";
+    }
+  };
+
   const fetchEachPath = (switchNode) => {
     const connectedEdges = edges.filter((edge) => edge.source === switchNode.id);
     connectedEdges.forEach((edge) => {
@@ -513,9 +540,63 @@ function App() {
       fetchRoutingPaths(routerNode, null);
     });
   };
+  const routingPathFetch = (c_node) => {
+    const routerNode = nodes.find((node) => node.id === c_node.id);
+    const connectedEdges = edges.filter((edge) => edge.source === routerNode.id);
+
+    connectedEdges.forEach((edge, index) => { // Corrected the parameter order
+      const targetNode = nodes.find((node) => node.id === edge.target);
+      if (targetNode.id !== routerNode.id) {
+        let ip = targetNode.data.ip;
+        // Assuming ip is in the form of /^\d{3}.\d{3}.\d{3}.\d{3}$/;
+        // Take only the first three octets and append .0
+        ip = ip.replace(/^(\d{3}\.\d{3}\.\d{3})$/, '$1.0');
+        let name;
+        if (targetNode.data.type === "Router")
+          name = `Serial1/${index}`;
+        else
+          name = `FastEthernet1/${index}`;
+
+        // if (!targetNode.data.path) {
+        //   targetNode.data.path = new Map(); // Initialize path as Map if not already initialized
+        // }
+
+        c_node.data.path.set(name, ip); // Use set method to add entry to Map
+      }
+
+      // Update the node within the loop
+
+    });
+    const updatedNodes = nodes.map((node) =>
+      node.id === c_node.id ? c_node : node
+    );
+    setNodes(updatedNodes);
+  }
+
+  const handleRipSubmit = () => {
+    const ripInput = document.getElementById('ripInput').value;
+    const sourceNode = nodes.find((node) => node.id === selectedComponent.id);
+    if (!sourceNode) {
+      console.error('Source node not found.');
+      return;
+    }
+    let index = 0;
+    if (sourceNode.data.path) {
+      index = [...sourceNode.data.path.keys()].filter(key => key.startsWith('RIP')).length;
+    }
+    sourceNode.data.path.set(`RIP${index + 1}`, ripInput);
+    setSelectedComponent(sourceNode);
+    const updatedNodes = nodes.map((node) =>
+      node.id === sourceNode.id ? sourceNode : node
+    );
+    setNodes(updatedNodes);
+    document.getElementById('ripInput').value = '';
+  };
+
 
 
   const handleSimulate = () => {
+    const port = data.port;
     const hasNodeWithNullIp = nodes.some((obj) => obj.data.ip === null);
     const hasNodeWithNullGateway = nodes.some((obj) => obj.data.Gateway === null);
     if (hasNodeWithNullIp) {
@@ -561,6 +642,10 @@ function App() {
           HubEdges.forEach((HubEdge) => {
             const hubTargetNode = updatedNodes.find((node) => node.id === HubEdge.target);
             hubTargetNode.data.data_received = sourceNode.data.data_shared;
+            if (port === 21)
+              hubTargetNode.data.FTP = 1;
+            else
+              hubTargetNode.data.http = 1;
             const updatedHubEdge = { ...HubEdge, data: data.preview, animated: true };
             updatedEdges = updatedEdges.map((edgeItem) =>
               edgeItem.id === updatedHubEdge.id ? updatedHubEdge : edgeItem
@@ -569,6 +654,10 @@ function App() {
         }
       }
       targetNode.data.data_received = sourceNode.data.data_shared;
+      if (port === 21)
+        targetNode.data.FTP = 1;
+      else
+        targetNode.data.http = 1;
       updatedNodes = updatedNodes.map((node) =>
         node.id === targetNode.id ? targetNode : node
       );
@@ -579,8 +668,6 @@ function App() {
     }
     setNodes(updatedNodes);
     setEdges(updatedEdges);
-    console.log(updatedEdges);
-    console.log(updatedNodes);
     handleClose()
   };
 
@@ -593,6 +680,7 @@ function App() {
     console.log('Node clicked:', node);
     if (node.data.type === "Router" && node.data.ip !== null && node.data.routingTable.size < 1) {
       routingTableFetch()
+      routingPathFetch(node)
     }
     domainFind()
     switchingTableFetch()
@@ -827,12 +915,7 @@ function App() {
                       <Flex ml={8} rounded="10" fontSize='sm'>
                         <Text fontWeight="bold" mr={1}>Error Correction: </Text>Error at {selectedComponent.error} bit
                       </Flex>)}
-                    <Flex ml={8} rounded="10" fontSize='sm'>
-                      <Text fontWeight="bold" mr={1}>Shared: </Text>
-                      {selectedComponent.data.data_shared ? selectedComponent.data.data_shared : "No data Found"}</Flex>
-                    <Flex ml={8} rounded="10" fontSize='sm'>
-                      <Text fontWeight="bold" mr={1}>Recieved: </Text>
-                      {selectedComponent.data.data_received ? selectedComponent.data.data_received : "No data Found"}</Flex>
+
                     {selectedComponent.data.data_recieved && (<Flex ml={8} rounded="10" fontSize='sm'>
                       <Text fontWeight="bold" mr={1}>Data Received: </Text>{selectedComponent.data.data_recieved}</Flex>)}
                     {selectedComponent.data.switchingTable.size !== 0 && (
@@ -861,6 +944,18 @@ function App() {
                     <Flex ml={8} rounded="10" fontSize='sm'>
                       <Text fontWeight="bold" mr={1}>Gateway: </Text>{selectedComponent.data.gateway}
                     </Flex>
+                    {selectedComponent.data.path && selectedComponent.data.path.size !== 0 && (
+                      <>
+                        {[...selectedComponent.data.path.entries()].map(([name, ip], index) => (
+                          <Flex key={index} ml={8} rounded="10" fontSize='sm'>
+                            <Text fontWeight="bold" mr={1}>{name}:</Text>
+                            <Text>{ip}</Text>
+                          </Flex>
+                        ))}
+                        <Flex ml={8} rounded="10" fontSize='sm'><Input mr={2} h={'auto'} w={'auto'} id="ripInput"></Input>
+                          <Button h={'auto'} fontSize='sm' backgroundColor="#EB4999" textColor="white" onClick={handleRipSubmit}>RIP </Button></Flex>
+                      </>
+                    )}
                     {selectedComponent.data.routingTable && selectedComponent.data.routingTable.size !== 0 && (
                       <Flex direction="column" mx={6} my={1} px={2} rounded={5} border="1px solid #CBD5E0">
                         <Text fontSize="sm" fontWeight="bold" textAlign="center">Routing Table</Text>
@@ -884,7 +979,20 @@ function App() {
                       </Flex>
                     )}
                     <>{divider("Transport")}</>
+                    <Flex ml={8} rounded="10" fontSize='sm'>
+                      <Text fontWeight="bold" mr={1}>Flow Control: </Text>{(selectedComponent.data.flow) ? selectedComponent.data.flow : "No Data Found"}
+                    </Flex>
+                    <Flex ml={8} rounded="10" fontSize='sm'>
+                      <Text fontWeight="bold" mr={1}>Port 21 (FTP): </Text>{selectedComponent.data.FTP ? "busy" : "Open"}</Flex>
+                    <Flex ml={8} rounded="10" fontSize='sm'>
+                      <Text fontWeight="bold" mr={1}>Port 80 (HTTP): </Text>{selectedComponent.data.http ? "busy" : "Open"}</Flex>
                     <>{divider("Application")}</>
+                    <Flex ml={8} rounded="10" fontSize='sm'>
+                      <Text fontWeight="bold" mr={1}>Shared: </Text>
+                      {selectedComponent.data.data_shared ? selectedComponent.data.data_shared : "No data Found"}</Flex>
+                    <Flex ml={8} rounded="10" fontSize='sm'>
+                      <Text fontWeight="bold" mr={1}>Recieved: </Text>
+                      {selectedComponent.data.data_received ? selectedComponent.data.data_received : "No data Found"}</Flex>
                     <Divider mx='6' w='auto' borderColor='gray.300' />
                   </Box>) : (<Box height="400px" p="auto" textAlign="center">Component is deleted or not selected</Box>)}
 
@@ -984,7 +1092,12 @@ function App() {
                   </Flex>
                   {divider("Data")}
                   <Flex flexDirection="column" alignItems="center">
-                    <Input value={data.binaryData} onChange={(e) => handleDataChange(e)} placeholder="Enter data" />
+                    <Flex>
+                      <Input value={data.binaryData} onChange={(e) => handleDataChange(e)} placeholder="Enter data" px={20} mr={5} />
+                      <Select mb={4} onChange={handlePortChange} >
+                        <option value="21">Port 21</option>
+                        <option value="80">Port 80</option>
+                      </Select></Flex>
                     {Object.keys(data.path).length === 0 ? (
                       <Button colorScheme="blue" w="100px" my={2} onClick={handleFetchPath}>Fetch Path</Button>) :
                       (
