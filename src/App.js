@@ -7,13 +7,13 @@ import { useDisclosure, ButtonGroup, Modal, ModalOverlay, ModalContent, ModalHea
 import { PiHouseLineDuotone, PiNotePencilDuotone, PiPlusSquareDuotone, PiShareNetworkDuotone, PiTrashDuotone } from "react-icons/pi";
 import { SlArrowUp, SlArrowDown, SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import 'reactflow/dist/style.css';
-import logo from "./assets/Black___Blue_Minimalist_Modern_Initial_Font_Logo-removebg-preview.png"
+import logo from "./assets/logo.png"
 import DataCenter from "./assets/icons8-data-center-64.png"
 import Switch from './assets/icons8-switch-64.png'
 import Hub from './assets/icons8-hub-64.png'
 import Laptop from './assets/icons8-laptop-64.png'
 import Router from './assets/icons8-router-64.png'
-import Server from './assets/icons8-server-64.png'
+// import Server from './assets/icons8-server-64.png'
 import Workstation from './assets/icons8-workstation-64.png'
 import ReactFlow, {
   Controls,
@@ -67,52 +67,47 @@ const topology = {
   star: {
     node: [{
       id: "1",
-      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Switch', name: "Switch", image: Switch },
+      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Switch', name: "Switch", image: Switch },
       type: 'component',
       position: { x: 0, y: 0 },
       sourcePosition: 'right',
       targetPosition: 'left',
-
       mac: macgenerate()
     },
     {
       id: "2",
-      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: -200, y: 0 },
       sourcePosition: 'right',
       targetPosition: 'left',
-
       mac: macgenerate()
     },
     {
       id: '3',
-      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 200, y: -200 },
       sourcePosition: 'right',
       targetPosition: 'left',
-
       mac: macgenerate()
     },
     {
       id: '4',
-      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 200, y: 0 },
       sourcePosition: 'right',
       targetPosition: 'left',
-
       mac: macgenerate()
     },
     {
       id: '5',
-      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 200, y: 200 },
       sourcePosition: 'right',
       targetPosition: 'left',
-
       mac: macgenerate()
     }],
     edge: [{ source: '2', target: '1', id: 'reactflow__edge-2-1', selected: false },
@@ -123,17 +118,16 @@ const topology = {
   mesh: {
     node: [{
       id: "1",
-      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: -100, y: 0 },
       sourcePosition: 'right',
       targetPosition: 'left',
-
       mac: macgenerate()
     },
     {
       id: "2",
-      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 100, y: -200 },
       sourcePosition: 'right',
@@ -142,7 +136,7 @@ const topology = {
     },
     {
       id: '3',
-      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Workstation', name: "Workstation", image: Workstation },
+      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Workstation', name: "Workstation", image: Workstation },
       type: 'component',
       position: { x: 300, y: 0 },
       sourcePosition: 'right',
@@ -151,7 +145,7 @@ const topology = {
     },
     {
       id: '4',
-      data: { data_received: null, data_shared: null, switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
+      data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: 'Laptop', name: "Laptop", image: Laptop },
       type: 'component',
       position: { x: 100, y: 200 },
       sourcePosition: 'right',
@@ -170,6 +164,8 @@ function App() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [data, setData] = useState({
     rename: null,
+    ip: null,
+    gateway: null,
     binaryData: null,
     path: {},
     EDetection: "CRC",
@@ -181,6 +177,8 @@ function App() {
     preview: null,
     codeword: null,
     frameword: null,
+    collisionDomain: 0,
+    broadcastDomain: 0,
   })
   const handleRename = (event, flag) => {
     if (flag) {
@@ -197,6 +195,48 @@ function App() {
     }
     setData({ ...data, rename: event.target.value });
   };
+  const handleIpChange = (event) => {
+    const newIp = event.target.value;
+    setData({ ...data, ip: newIp });
+  };
+  const handleIp = () => {
+    const newIp = data.ip;
+    const ipPattern = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
+    if (!ipPattern.test(newIp)) {
+      alert("Invalid IP address format");
+      return;
+    }
+    const updateNode = nodes.find((node) => node.id === selectedComponent.id);
+    if (updateNode) {
+      updateNode.data.ip = newIp;
+      setNodes(nodes.map((node) => node.id === updateNode.id ? updateNode : node));
+      setSelectedComponent(updateNode);
+      setData({ ...data, ip: null });
+      console.log('ip Cahnged');
+      return;
+    }
+  };
+  const handleGatewayChange = (event) => {
+    const newGateway = event.target.value;
+    setData({ ...data, gateway: newGateway });
+  };
+  const handleGateway = () => {
+    const newIp = data.gateway;
+    const ipPattern = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
+    if (!ipPattern.test(newIp)) {
+      alert("Invalid IP address format.");
+      return;
+    }
+    const updateNode = nodes.find((node) => node.id === selectedComponent.id);
+    if (updateNode) {
+      updateNode.data.gateway = newIp;
+      setNodes(nodes.map((node) => node.id === updateNode.id ? updateNode : node));
+      setSelectedComponent(updateNode);
+      setData({ ...data, gateway: null });
+      console.log('gateway Cahnged');
+      return;
+    }
+  }
 
   const handleDataChange = (e) => {
     console.log(data);
@@ -217,6 +257,8 @@ function App() {
       flag: "0111",
       selectedComponent: null,
       preview: null,
+      collisionDomain: 0,
+      broadcastDomain: 0,
     });
     onClose()
   };
@@ -228,6 +270,8 @@ function App() {
   const handleFetchPath = () => {
     const currentNode = nodes.find((node) => node.id === selectedComponent.id);
     const connectedEdges = edges.filter((edge) => edge.source === currentNode.id);
+    console.log(currentNode);
+    console.log(connectedEdges);
     if (connectedEdges.length === 0)
       alert("No component found Try to reconnect")
     const fetchFurther = (value, node, intermediateNodes = []) => {
@@ -360,7 +404,7 @@ function App() {
     { id: 2, name: "Switch", image: Switch },
     { id: 3, name: "Hub", image: Hub },
     { id: 4, name: "Laptop", image: Laptop },
-    // { id: 5, name: "Router", image: Router },
+    { id: 5, name: "Router", image: Router },
     // { id: 6, name: "Server", image: Server },
     { id: 7, name: "Workstation", image: Workstation },
   ])
@@ -385,7 +429,7 @@ function App() {
         ...prevNodes,
         {
           id: prevNodes.length > 0 ? (parseInt(prevNodes[prevNodes.length - 1].id) + 1).toString() : "1",
-          data: { data_received: null, data_shared: null, switchingTable: new Set(), type: name, name: name, image: image[0].image },
+          data: { ip: null, data_received: null, data_shared: null, routingTable: new Set(), switchingTable: new Set(), type: name, name: name, image: image[0].image },
           type: 'component',
           position: { x: newX, y: newY },
           sourcePosition: 'right',
@@ -418,7 +462,16 @@ function App() {
     );
     setNodes(updatedNodes);
   };
-
+  const domainFind = () => {
+    if (data.collisionDomain == 0 && data.broadcastDomain == 0) {
+      const switches = nodes.filter((node) => node.data.type === "Hub");
+      switches.forEach(() => {
+        data.broadcastDomain++;
+      }
+      )
+    }
+    return;
+  }
   const switchingTableFetch = () => {
     const switches = nodes.filter((node) => node.data.type === "Switch");
     switches.forEach((switchNode) => {
@@ -426,7 +479,54 @@ function App() {
       fetchEachPath(switchNode);
     });
   };
+  const fetchRoutingPaths = (routerNode, parentNode, hops = 0) => {
+    const connectedEdges = edges.filter((edge) => edge.source === routerNode.id);
+
+    connectedEdges.forEach((edge) => {
+      const targetNode = nodes.find((node) => node.id === edge.target);
+
+      if (targetNode.id !== routerNode.id) {
+        if (!parentNode) {
+          parentNode = routerNode;
+        }
+
+        const hopsToTarget = hops + 1;
+        const routingEntry = { target: edge.target, hops: hopsToTarget };
+        parentNode.data.routingTable.add(routingEntry);
+
+        if (targetNode.data.type === "Router" || targetNode.data.type === "Switch") {
+          fetchRoutingPaths(targetNode, parentNode, hopsToTarget);
+        }
+      }
+    });
+
+    const updatedNodes = nodes.map((node) =>
+      node.id === parentNode.id ? parentNode : node
+    );
+    setNodes(updatedNodes);
+  };
+
+  const routingTableFetch = () => {
+    const routers = nodes.filter((node) => node.data.type === "Router");
+
+    routers.forEach((routerNode) => {
+      fetchRoutingPaths(routerNode, null);
+    });
+  };
+
+
   const handleSimulate = () => {
+    const hasNodeWithNullIp = nodes.some((obj) => obj.data.ip === null);
+    const hasNodeWithNullGateway = nodes.some((obj) => obj.data.Gateway === null);
+    if (hasNodeWithNullIp) {
+      alert('Alert: Some nodes have null IP addresses.');
+      return;
+    }
+    if (hasNodeWithNullGateway) {
+      alert('Alert: Some nodes have null Gateway addresses.');
+      return 0;
+    }
+
     const path = data.path[data.selectedComponent];
     const sourceNode = nodes.find((node) => node.id === path[0]);
     if (!sourceNode) {
@@ -491,6 +591,10 @@ function App() {
     setSelectedComponent(node)
     setComp(false);
     console.log('Node clicked:', node);
+    if (node.data.type === "Router" && node.data.ip !== null && node.data.routingTable.size < 1) {
+      routingTableFetch()
+    }
+    domainFind()
     switchingTableFetch()
   };
   const onEdgeClick = (event, edge) => {
@@ -581,6 +685,10 @@ function App() {
     }
 
   }
+  const getIp = (id) => {
+    const node = nodes.find((node) => node.id === id[0]);
+    return node ? node.data.ip : "Not Found";
+  };
   const getMac = (id) => {
     const node = nodes.find((node) => node.id === id[0]);
     return node ? node.mac : "Not Found";
@@ -746,6 +854,37 @@ function App() {
                         </Flex>
                       </Flex>
                     )}
+                    <>{divider("Network")}</>
+                    <Flex ml={8} rounded="10" fontSize='sm'>
+                      <Text fontWeight="bold" mr={1}>IP Address: </Text>{selectedComponent.data.ip}
+                    </Flex>
+                    <Flex ml={8} rounded="10" fontSize='sm'>
+                      <Text fontWeight="bold" mr={1}>Gateway: </Text>{selectedComponent.data.gateway}
+                    </Flex>
+                    {selectedComponent.data.routingTable && selectedComponent.data.routingTable.size !== 0 && (
+                      <Flex direction="column" mx={6} my={1} px={2} rounded={5} border="1px solid #CBD5E0">
+                        <Text fontSize="sm" fontWeight="bold" textAlign="center">Routing Table</Text>
+                        <Flex justify="space-between" fontSize="sm" mt={1} >
+                          <Text>Input IP</Text>
+                          <Divider borderColor='gray.300' h="auto" orientation='vertical' />
+                          <Text>Output IP</Text>
+                          <Divider borderColor='gray.300' h="auto" orientation='vertical' />
+                          <Text>Hops</Text>
+                        </Flex>
+                        <Divider borderColor='gray.300' w="auto" />
+                        <Flex direction="column" >
+                          {[...selectedComponent.data.routingTable.entries()].map(([i, j], index) => (
+                            <Flex key={index} justify="space-between" fontSize="sm">
+                              <Text fontSize={11}>{selectedComponent.data.ip}</Text>
+                              <Text fontSize={11}>{getIp(i.target)}</Text>
+                              <Text fontSize={11}>{i.hops}</Text>
+                            </Flex>
+                          ))}
+                        </Flex>
+                      </Flex>
+                    )}
+                    <>{divider("Transport")}</>
+                    <>{divider("Application")}</>
                     <Divider mx='6' w='auto' borderColor='gray.300' />
                   </Box>) : (<Box height="400px" p="auto" textAlign="center">Component is deleted or not selected</Box>)}
 
@@ -758,6 +897,12 @@ function App() {
             <Flex height="50px" mx="2" justifyContent='end'>
               <Flex justifyContent="center" alignItems="center" m={0} mr="auto" ml={2} h="30px" my="auto" fontSize={24} rounded={5}>
                 <Text fontSize={15} fontWeight="bold">Transmission Mode:</Text> <Text ml={1} fontSize={15}>Half-Duplex</Text>
+              </Flex>
+              <Flex justifyContent="center" alignItems="center" m={0} mr="auto" ml={2} h="30px" my="auto" fontSize={24} rounded={5}>
+                <Text fontSize={15} fontWeight="bold">Collision Domain:</Text> <Text ml={1} fontSize={15}>{data.collisionDomain}</Text>
+              </Flex>
+              <Flex justifyContent="center" alignItems="center" m={0} mr="auto" ml={2} h="30px" my="auto" fontSize={24} rounded={5}>
+                <Text fontSize={15} fontWeight="bold">Broadcast Domain:</Text> <Text ml={1} fontSize={15}>{data.broadcastDomain}</Text>
               </Flex>
               <Divider borderColor='gray.300' my='1' mx="2" h='auto' orientation='vertical' />
               <Flex onClick={handleDelete} cursor="pointer" justifyContent="center" alignItems="center" w="30px" h="30px" _hover={{ bg: 'gray.200' }} m={1} fontSize={24} rounded={5}>
@@ -828,6 +973,14 @@ function App() {
                   <Flex align="center" mb={4}>
                     <Input value={data.rename} onChange={(e) => handleRename(e, false)} />
                     <Button ml={2} colorScheme="blue" onClick={(e) => handleRename(e, true)}>Rename</Button>
+                  </Flex>
+                  <Flex align="center" mb={4}>
+                    <Input value={data.ip} onChange={(e) => handleIpChange(e)} />
+                    <Button ml={2} colorScheme="blue" onClick={(e) => handleIp(e)}>IPv4</Button>
+                  </Flex>
+                  <Flex align="center" mb={4}>
+                    <Input value={data.gateway} onChange={(e) => handleGatewayChange(e)} />
+                    <Button ml={2} colorScheme="blue" onClick={(e) => handleGateway(e)}>Gateway</Button>
                   </Flex>
                   {divider("Data")}
                   <Flex flexDirection="column" alignItems="center">
